@@ -37,7 +37,7 @@ while IFS= read -r image; do
     # original_tag=$(echo "$image" | cut -d ':' -f2)
     
     original_tag="${image##*:}"
-    full_orig_path="${image%:*}"
+    full_repo_path="${image%:*}"
     original_repo="${full_repo_path##*/}"
 
     acr_compatible_repo_name="${original_repo//\//-}"
