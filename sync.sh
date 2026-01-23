@@ -33,8 +33,12 @@ while IFS= read -r image; do
     # 分离原始镜像的仓库名和标签
     # 例如：nginx:latest -> original_repo=nginx, original_tag=latest
     # 例如：jenkins/jenkins:lts -> original_repo=jenkins/jenkins, original_tag=lts
-    original_repo=$(echo "$image" | cut -d ':' -f1)
-    original_tag=$(echo "$image" | cut -d ':' -f2)
+    # original_repo=$(echo "$image" | cut -d ':' -f1)
+    # original_tag=$(echo "$image" | cut -d ':' -f2)
+    
+    original_tag="${image##*:}"
+    full_orig_path="${image%:*}"
+    original_repo="${full_repo_path##*/}"
 
     acr_compatible_repo_name="${original_repo//\//-}"
 
