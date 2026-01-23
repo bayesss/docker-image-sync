@@ -2,5 +2,5 @@ rabbitmq:4-management
 linuxserver/ffmpeg:8.0.1
 ghcr.io/astral-sh/uv:python3.12-trixie-slim
 ghcr.io/astral-sh/uv:python3.12-trixie
-metarank/metarank
+metarank/metarank:latest
 # 此处一定要有一行空行
