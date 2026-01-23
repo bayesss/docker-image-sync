@@ -9,4 +9,6 @@ metarank/metarank:0.7.11
 metarank/metarank:0.7.11-amd64
 nginx:1.29
 nginx:1.29-trixie
+docker.elastic.co/elasticsearch/elasticsearch:9.2.4
+docker.elastic.co/kibana/kibana:9.2.4
 # 此处一定要有一行空行
