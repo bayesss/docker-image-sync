@@ -12,4 +12,5 @@ nginx:1.29-trixie
 docker.elastic.co/elasticsearch/elasticsearch:9.2.4
 docker.elastic.co/kibana/kibana:9.2.4
 teddysun/xray:latest
+grafana/grafana:latest
 # 此处一定要有一行空行
