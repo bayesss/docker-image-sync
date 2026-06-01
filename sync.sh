@@ -16,6 +16,21 @@ if [ -z "$ACR_REGISTRY" ] || [ -z "$ACR_NAMESPACE" ]; then
     exit 1
 fi
 
+# 获取远程镜像的指纹，用于跨 Registry 比较镜像是否相同。
+# 多架构镜像：对所有平台 manifest digest 排序后求哈希。
+# 单架构镜像：使用 config digest。
+get_image_fingerprint() {
+    local image="$1"
+    local manifest
+    manifest=$(docker manifest inspect "$image" 2>/dev/null) || return 1
+
+    if echo "$manifest" | jq -e '.manifests | length > 0' >/dev/null 2>&1; then
+        echo "$manifest" | jq -r '.manifests[] | .digest' | sort | sha256sum | cut -d' ' -f1
+    else
+        echo "$manifest" | jq -r '.config.digest'
+    fi
+}
+
 echo "Starting Docker image synchronization to ACR..."
 echo "Target Registry: ${ACR_REGISTRY}"
 echo "Target Namespace: ${ACR_NAMESPACE}"
@@ -48,16 +63,23 @@ while IFS= read -r image; do
     echo "Original image full path: ${image}"
     echo "Target ACR image full path: ${target_full_image_path}"
 
-    # 检查阿里云仓库是否已有该tag
-    # docker manifest inspect 命令用于检查远程 Registry 中的镜像是否存在。
-    # 如果已经存在，则跳过本次同步，避免重复操作和不必要的流量消耗。
-    if docker manifest inspect "${target_full_image_path}" > /dev/null 2>&1; then
-        echo "${target_full_image_path} 已存在于 ACR，跳过本次同步。"
+    # 比较上游镜像与 ACR 镜像的指纹，判断是否需要同步。
+    upstream_fp=$(get_image_fingerprint "${image}") || true
+    acr_fp=$(get_image_fingerprint "${target_full_image_path}") || true
+
+    if [ -n "$upstream_fp" ] && [ "$upstream_fp" = "$acr_fp" ]; then
+        echo "${target_full_image_path} 已是最新，跳过本次同步。"
         echo "-----------------------------------"
-        continue # 跳过当前循环的后续步骤
+        continue
     fi
 
-    echo "Image ${target_full_image_path} not found in ACR. Proceeding with sync..."
+    if [ -z "$upstream_fp" ]; then
+        echo "Warning: 无法获取上游镜像 ${image} 的指纹，尝试同步..."
+    elif [ -z "$acr_fp" ]; then
+        echo "Image ${target_full_image_path} not found in ACR. Proceeding with sync..."
+    else
+        echo "Image ${target_full_image_path} 存在但版本不同，重新同步..."
+    fi
 
     # 拉取原始镜像
     echo "Pulling original image: ${image}..."
