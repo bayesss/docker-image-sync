@@ -1,49 +1,49 @@
-name: Sync Docker Images to Aliyun ACR # Workflow 的名称
-run-name: ${{ github.actor }} is syncing Docker images # 在 GitHub Actions 页面显示运行者
+name: Sync Docker Images to Aliyun ACR
+run-name: ${{ github.actor }} is syncing Docker images
 on:
-  push: # 当有代码推送到以下分支或路径时触发
+  push:
     branches:
-      - main # 监听 main 分支的推送
+      - main
     paths:
-      - 'images.txt' # 只有 images.txt 文件更新才触发
-      - '.github/workflows/sync.yml' # workflow 文件自身更新也触发
-  workflow_dispatch: # 允许手动触发 Workflow
-  
+      - 'images.txt'
+      - 'sync.sh'
+      - '.github/workflows/sync.yaml'
+  workflow_dispatch:
+
 jobs:
-  sync-images: # 定义一个 Job
-    runs-on: ubuntu-latest # GitHub Actions Runner 运行环境 (Ubuntu 最新版)
+  sync-images:
+    runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository # 步骤1: 拉取 GitHub 仓库代码
-        uses: actions/checkout@v4 # 使用 actions/checkout@v4 action
-      
-      - name: Login to Aliyun Container Registry (ACR) # 步骤2: 登录 ACR
-        uses: docker/login-action@v3 # 使用 docker/login-action@v3 action
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Install crane
+        uses: imjasonh/setup-crane@v0.4
+
+      - name: Login to Aliyun Container Registry (ACR)
+        uses: docker/login-action@v4
         with:
-          registry: ${{ secrets.ACR_REGISTRY }} # 动态构建 ACR Registry 地址
-          username: ${{ secrets.ACR_USERNAME }} # 使用 GitHub Secrets 中的 ACR 用户名 (RAM AccessKey ID)
-          password: ${{ secrets.ACR_PASSWORD }} # 使用 GitHub Secrets 中的 ACR 密码 (RAM AccessKey Secret)
-          
-      - name: Execute sync script # 步骤3: 执行同步脚本
-        run: |
-          bash "${{ github.workspace }}/sync.sh" # 运行 sync.sh 脚本
+          registry: ${{ secrets.ACR_REGISTRY }}
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
+
+      - name: Login to second Aliyun Container Registry (ACR)
+        uses: docker/login-action@v4
+        with:
+          registry: ${{ secrets.ACR_REGISTRY2 }}
+          username: ${{ secrets.ACR_USERNAME2 }}
+          password: ${{ secrets.ACR_PASSWORD2 }}
+
+      - name: Execute sync script
+        run: bash "${{ github.workspace }}/sync.sh"
         env:
           ACR_REGISTRY: ${{ secrets.ACR_REGISTRY }}
           ACR_NAMESPACE: ${{ secrets.ACR_NAMESPACE }}
+          ACR_REGISTRY2: ${{ secrets.ACR_REGISTRY2 }}
+          ACR_NAMESPACE2: ${{ secrets.ACR_NAMESPACE2 }}
+          DIGEST_PARALLELISM: "14"
+          SYNC_PARALLELISM: "3"
+          DOCKER_PLATFORM: linux/amd64
 
-
-      - name: Login to Aliyun Container Registry (ACR) # 步骤2: 登录 第二个ACR
-        uses: docker/login-action@v3 # 使用 docker/login-action@v3 action
-        with:
-          registry: ${{ secrets.ACR_REGISTRY2 }} # 动态构建 ACR Registry 地址
-          username: ${{ secrets.ACR_USERNAME2 }} # 使用 GitHub Secrets 中的 ACR 用户名 (RAM AccessKey ID)
-          password: ${{ secrets.ACR_PASSWORD2 }} # 使用 GitHub Secrets 中的 ACR 密码 (RAM AccessKey Secret)
-          
-      - name: Execute sync script # 步骤3: 执行同步脚本
-        run: |
-          bash "${{ github.workspace }}/sync.sh" # 运行 sync.sh 脚本
-        env:
-          ACR_REGISTRY: ${{ secrets.ACR_REGISTRY2 }}
-          ACR_NAMESPACE: ${{ secrets.ACR_NAMESPACE2 }}
-        
-      - name: Job status # 步骤4 (可选): 打印 Job 状态
+      - name: Job status
         run: echo "This job's status is ${{ job.status }}"
