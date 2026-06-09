@@ -1,5 +1,9 @@
 rabbitmq:4-management
+valkey/valkey:8
+redis:7
+redis:8
 linuxserver/ffmpeg:8.0.1
+linuxserver/ffmpeg:version-8.1-cli
 ghcr.io/astral-sh/uv:python3.12-trixie-slim
 ghcr.io/astral-sh/uv:python3.12-trixie
 ghcr.io/astral-sh/uv:python3.13-trixie-slim
@@ -8,9 +12,12 @@ metarank/metarank:latest
 metarank/metarank:0.7.11
 metarank/metarank:0.7.11-amd64
 nginx:1.29
-nginx:1.29-trixie
-docker.elastic.co/elasticsearch/elasticsearch:9.2.4
-docker.elastic.co/kibana/kibana:9.2.4
-teddysun/xray:latest
+nginx:1.29-alpine
+nginx:1.31
+nginx:1.31-alpine
+docker.elastic.co/elasticsearch/elasticsearch:9.4.2
+docker.elastic.co/kibana/kibana:9.4.2
 grafana/grafana:latest
+teddysun/xray:latest
+
 # 此处一定要有一行空行
