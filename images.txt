@@ -19,5 +19,6 @@ docker.elastic.co/elasticsearch/elasticsearch:9.4.2
 docker.elastic.co/kibana/kibana:9.4.2
 grafana/grafana:latest
 teddysun/xray:latest
+minio/minio:RELEASE.2025-04-22T22-12-26Z
 
 # 此处一定要有一行空行
