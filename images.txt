@@ -6,6 +6,8 @@ linuxserver/ffmpeg:8.0.1
 linuxserver/ffmpeg:version-8.1-cli
 ghcr.io/astral-sh/uv:python3.12-trixie-slim
 ghcr.io/astral-sh/uv:python3.12-trixie
+ghcr.io/astral-sh/uv:python3.12-alpine
+ghcr.io/astral-sh/uv:python3.13-alpine
 ghcr.io/astral-sh/uv:python3.13-trixie-slim
 ghcr.io/astral-sh/uv:python3.13-trixie
 metarank/metarank:latest
