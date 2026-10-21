@@ -22,6 +22,7 @@ docker.elastic.co/kibana/kibana:9.4.2
 grafana/grafana:latest
 teddysun/xray:latest
 # minio/minio:RELEASE.2025-04-22T22-12-26Z
+rustfs/rustfs:latest
 xuxueli/xxl-job-admin:3.4.2
 jc21/nginx-proxy-manager:2
 
