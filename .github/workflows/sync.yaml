@@ -8,6 +8,10 @@ on:
       - 'images.txt'
       - 'sync.sh'
       - '.github/workflows/sync.yaml'
+  schedule:
+    # 北京时间周日凌晨 3:00 对应的 UTC 时间为：周六 19:00
+    # Cron 表达式：分 小时 日 月 星期 (0=周日, 6=周六)
+    - cron: '0 19 * * 6'
   workflow_dispatch:
 
 jobs:
